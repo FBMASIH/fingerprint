@@ -27,7 +27,7 @@
             font-size: 1.2rem;
             color: #555;
         }
-        #result {
+        #result, #success {
             font-size: 1rem;
             color: green;
             margin-top: 15px;
@@ -55,11 +55,25 @@
             <div class="spinner"></div>
             Collecting fingerprint data...
         </div>
-        <div id="result">✅ Fingerprint successfully sent to server.</div>
+        <div id="result"></div>
     </div>
 
     <script>
-        // Override fetch to detect our save request
+        function showSuccessMessage() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString();
+            const resultElem = document.getElementById("result");
+
+            // تغییر متن و ID
+            resultElem.innerText = `✅ Fingerprint successfully sent to server at ${timeStr}`;
+            resultElem.id = "success"; 
+
+            // نمایش پیام
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("success").style.display = "block";
+        }
+
+        // هک fetch
         (function() {
             const originalFetch = window.fetch;
             window.fetch = async function(...args) {
@@ -68,8 +82,7 @@
                     try {
                         const response = await originalFetch.apply(this, args);
                         if (response.ok) {
-                            document.getElementById("loading").style.display = "none";
-                            document.getElementById("result").style.display = "block";
+                            showSuccessMessage();
                         }
                         return response;
                     } catch (err) {
@@ -80,7 +93,7 @@
             };
         })();
 
-        // Override XHR to detect if library uses XMLHttpRequest
+        // هک XHR
         (function() {
             const open = XMLHttpRequest.prototype.open;
             const send = XMLHttpRequest.prototype.send;
@@ -92,8 +105,7 @@
                 if (this._isSaveReq) {
                     this.addEventListener("load", function() {
                         if (this.status === 200) {
-                            document.getElementById("loading").style.display = "none";
-                            document.getElementById("result").style.display = "block";
+                            showSuccessMessage();
                         }
                     });
                 }
