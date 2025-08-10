@@ -21,7 +21,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
         }
         #loading {
             font-size: 1.2rem;
@@ -31,7 +31,9 @@
             font-size: 1rem;
             color: #333;
             margin-top: 15px;
-            word-break: break-all;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
         .spinner {
             border: 4px solid #eee;
@@ -53,25 +55,31 @@
         <h2>Fingerprint Test</h2>
         <div id="loading">
             <div class="spinner"></div>
-            Loading fingerprint...
+            Collecting fingerprint data...
         </div>
         <div id="result" style="display: none;"></div>
     </div>
 
     <script src="https://customfingerprints.bablosoft.com/clientsafe.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            ProcessFingerprint(false, "ohhg9i590s08lqxu1siq4cd6cq449f2x5frln00jzmr0um1t2o3b2zhht4u5xxpn")
-                .then(response => {
-                    document.getElementById("loading").style.display = "none";
-                    document.getElementById("result").style.display = "block";
-                    document.getElementById("result").textContent = "Fingerprint Result: " + JSON.stringify(response);
-                })
-                .catch(err => {
-                    document.getElementById("loading").style.display = "none";
-                    document.getElementById("result").style.display = "block";
-                    document.getElementById("result").textContent = "Error: " + err;
-                });
+        document.addEventListener("DOMContentLoaded", async function() {
+            try {
+                // اجرای fingerprint
+                const fpData = await ProcessFingerprint(
+                    false, 
+                    "ohhg9i590s08lqxu1siq4cd6cq449f2x5frln00jzmr0um1t2o3b2zhht4u5xxpn"
+                );
+
+                // وقتی کارش تموم شد
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").textContent = JSON.stringify(fpData, null, 2);
+
+            } catch (err) {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").textContent = "Error: " + err;
+            }
         });
     </script>
 </body>
