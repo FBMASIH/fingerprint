@@ -58,22 +58,57 @@
         <div id="result">✅ Fingerprint successfully sent to server.</div>
     </div>
 
+    <script>
+        // Override fetch to detect our save request
+        (function() {
+            const originalFetch = window.fetch;
+            window.fetch = async function(...args) {
+                const url = args[0];
+                if (typeof url === "string" && url.includes("/save?publickey=")) {
+                    try {
+                        const response = await originalFetch.apply(this, args);
+                        if (response.ok) {
+                            document.getElementById("loading").style.display = "none";
+                            document.getElementById("result").style.display = "block";
+                        }
+                        return response;
+                    } catch (err) {
+                        console.error("Save request failed:", err);
+                    }
+                }
+                return originalFetch.apply(this, args);
+            };
+        })();
+
+        // Override XHR to detect if library uses XMLHttpRequest
+        (function() {
+            const open = XMLHttpRequest.prototype.open;
+            const send = XMLHttpRequest.prototype.send;
+            XMLHttpRequest.prototype.open = function(method, url, ...rest) {
+                this._isSaveReq = typeof url === "string" && url.includes("/save?publickey=");
+                return open.call(this, method, url, ...rest);
+            };
+            XMLHttpRequest.prototype.send = function(...args) {
+                if (this._isSaveReq) {
+                    this.addEventListener("load", function() {
+                        if (this.status === 200) {
+                            document.getElementById("loading").style.display = "none";
+                            document.getElementById("result").style.display = "block";
+                        }
+                    });
+                }
+                return send.apply(this, args);
+            };
+        })();
+    </script>
+
     <script src="https://customfingerprints.bablosoft.com/clientsafe.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", async function() {
-            try {
-                await ProcessFingerprint(
-                    false, 
-                    "ohhg9i590s08lqxu1siq4cd6cq449f2x5frln00jzmr0um1t2o3b2zhht4u5xxpn"
-                );
-
-                // وقتی به اینجا رسید یعنی درخواست موفق بوده
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("result").style.display = "block";
-
-            } catch (err) {
-                document.getElementById("loading").innerHTML = "❌ Error: " + err.message;
-            }
+        document.addEventListener("DOMContentLoaded", function() {
+            ProcessFingerprint(
+                false,
+                "ohhg9i590s08lqxu1siq4cd6cq449f2x5frln00jzmr0um1t2o3b2zhht4u5xxpn"
+            );
         });
     </script>
 </body>
