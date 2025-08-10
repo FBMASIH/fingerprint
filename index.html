@@ -29,11 +29,9 @@
         }
         #result {
             font-size: 1rem;
-            color: #333;
+            color: green;
             margin-top: 15px;
-            text-align: left;
-            white-space: pre-wrap;
-            word-break: break-word;
+            display: none;
         }
         .spinner {
             border: 4px solid #eee;
@@ -57,28 +55,24 @@
             <div class="spinner"></div>
             Collecting fingerprint data...
         </div>
-        <div id="result" style="display: none;"></div>
+        <div id="result">✅ Fingerprint successfully sent to server.</div>
     </div>
 
     <script src="https://customfingerprints.bablosoft.com/clientsafe.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", async function() {
             try {
-                // اجرای fingerprint
-                const fpData = await ProcessFingerprint(
+                await ProcessFingerprint(
                     false, 
                     "ohhg9i590s08lqxu1siq4cd6cq449f2x5frln00jzmr0um1t2o3b2zhht4u5xxpn"
                 );
 
-                // وقتی کارش تموم شد
+                // وقتی به اینجا رسید یعنی درخواست موفق بوده
                 document.getElementById("loading").style.display = "none";
                 document.getElementById("result").style.display = "block";
-                document.getElementById("result").textContent = JSON.stringify(fpData, null, 2);
 
             } catch (err) {
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("result").style.display = "block";
-                document.getElementById("result").textContent = "Error: " + err;
+                document.getElementById("loading").innerHTML = "❌ Error: " + err.message;
             }
         });
     </script>
