@@ -4,13 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fingerprint Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9fafb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #container {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        #loading {
+            font-size: 1.2rem;
+            color: #555;
+        }
+        #result {
+            font-size: 1rem;
+            color: #333;
+            margin-top: 15px;
+            word-break: break-all;
+        }
+        .spinner {
+            border: 4px solid #eee;
+            border-top: 4px solid #4cafef;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            animation: spin 1s linear infinite;
+            margin: 15px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+    </style>
 </head>
 <body>
-    <h1>صفحه تست فینگرپرینت</h1>
+    <div id="container">
+        <h2>Fingerprint Test</h2>
+        <div id="loading">
+            <div class="spinner"></div>
+            Loading fingerprint...
+        </div>
+        <div id="result" style="display: none;"></div>
+    </div>
+
     <script src="https://customfingerprints.bablosoft.com/clientsafe.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            ProcessFingerprint(false, "ohhg9i590s08lqxu1siq4cd6cq449f2x5frln00jzmr0um1t2o3b2zhht4u5xxpn");
+            ProcessFingerprint(false, "ohhg9i590s08lqxu1siq4cd6cq449f2x5frln00jzmr0um1t2o3b2zhht4u5xxpn")
+                .then(response => {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("result").style.display = "block";
+                    document.getElementById("result").textContent = "Fingerprint Result: " + JSON.stringify(response);
+                })
+                .catch(err => {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("result").style.display = "block";
+                    document.getElementById("result").textContent = "Error: " + err;
+                });
         });
     </script>
 </body>
